@@ -106,4 +106,104 @@ export class TransactionRepository implements ITransactionRepository {
     );
     return { data: transactions, total, page, limit };
   }
+
+  async approve(transactionId: string): Promise<Transaction> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const transaction = await queryRunner.manager.findOne(Transaction, {
+        where: { id: transactionId },
+        relations: { sender: true, receiver: true },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!transaction) {
+        throw new Error("Transaction not found");
+      }
+
+      if (transaction.status !== TransactionStatus.PENDING) {
+        throw new Error("Cannot approve a transaction that is not pending");
+      }
+
+      const sender = await queryRunner.manager.findOne(User, {
+        where: { id: transaction.sender.id },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!sender) {
+        throw new Error("Sender not found");
+      }
+
+      const receiver = await queryRunner.manager.findOne(User, {
+        where: { id: transaction.receiver.id },
+      });
+
+      if (!receiver) {
+        throw new Error("Receiver not found");
+      }
+
+      if (Number(sender.balance) < Number(transaction.amount)) {
+        throw new InsufficientFundsError();
+      }
+
+      sender.balance -= Number(sender.balance) - Number(transaction.amount);
+      receiver.balance = Number(receiver.balance) + Number(transaction.amount);
+      transaction.status = TransactionStatus.CONFIRMED;
+
+      await queryRunner.manager.save(User, sender);
+      await queryRunner.manager.save(User, receiver);
+      const savedTransaction = await queryRunner.manager.save(
+        Transaction,
+        transaction,
+      );
+
+      await queryRunner.commitTransaction();
+
+      return savedTransaction;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async reject(transactionId: string, reason: string): Promise<Transaction> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    queryRunner.connect();
+    queryRunner.startTransaction();
+
+    try {
+      const transaction = await queryRunner.manager.findOne(Transaction, {
+        where: { id: transactionId },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!transaction) throw new Error("Transaction not found");
+
+      if (transaction.status !== TransactionStatus.PENDING) {
+        throw new Error("Cannot reject a transaction that is not pending");
+      }
+
+      transaction.status = TransactionStatus.REJECTED;
+
+      transaction.rejectReason = reason;
+
+      const savedTransaction = await queryRunner.manager.save(
+        Transaction,
+        transaction,
+      );
+
+      await queryRunner.commitTransaction();
+
+      return savedTransaction;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

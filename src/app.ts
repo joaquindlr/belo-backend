@@ -11,13 +11,11 @@ const app: FastifyPluginAsync<AppOptions> = async (
   fastify,
   opts,
 ): Promise<void> => {
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(__dirname, "core/infrastructure/plugins"),
     options: opts,
   });
 
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(__dirname),
     matchFilter: /.*\.controller\.(ts|js)$/,

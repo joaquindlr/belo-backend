@@ -46,7 +46,7 @@ export class Transaction {
   status!: TransactionStatus;
 
   @Column({ type: "varchar", nullable: true })
-  rejection_reason!: string | null;
+  rejectReason!: string | null;
 
   @CreateDateColumn()
   date!: Date;

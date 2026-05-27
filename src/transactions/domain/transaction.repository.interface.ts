@@ -13,4 +13,7 @@ export interface ITransactionRepository {
     page: number,
     limit: number,
   ): Promise<Paginated<Transaction>>;
+
+  approve(transactionId: string): Promise<Transaction>;
+  reject(transactionId: string, reason: string): Promise<Transaction>;
 }

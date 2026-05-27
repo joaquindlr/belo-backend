@@ -7,7 +7,7 @@ import { CreateTransactionUseCase } from "./create-transaction.use-case";
 
 const transactionRepository = {
   createWithLock: jest.fn(),
-} as ITransactionRepository;
+} as any as ITransactionRepository;
 
 describe("CreateTransactionUseCase", () => {
   const useCase = new CreateTransactionUseCase(transactionRepository);
