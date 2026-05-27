@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import AutoLoad, { AutoloadPluginOptions } from "@fastify/autoload";
 import { FastifyPluginAsync, FastifyServerOptions } from "fastify";
+import "reflect-metadata";
 
 export interface AppOptions
   extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
@@ -12,7 +13,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
 ): Promise<void> => {
   // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
-    dir: join(__dirname, "plugins"),
+    dir: join(__dirname, "core/infrastructure/plugins"),
     options: opts,
   });
 
