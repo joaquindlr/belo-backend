@@ -8,9 +8,13 @@ import {
   InvalidAmountError,
   SameAccountTransferError,
 } from "../../domain/transaction.errors";
+import { TransactionRepository } from "../persistence/transaction.repository";
 
-const transactionsController: FastifyPluginAsync = async (fastify, opts) => {
-  const createTransactionUseCase = new CreateTransactionUseCase(AppDataSource);
+const transactionsController: FastifyPluginAsync = async (fastify) => {
+  const transactionRepository = new TransactionRepository(AppDataSource);
+  const createTransactionUseCase = new CreateTransactionUseCase(
+    transactionRepository,
+  );
 
   fastify.post("/transactions", async (request, reply) => {
     const dto = request.body as CreateTransactionDTO;
