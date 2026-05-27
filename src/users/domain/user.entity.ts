@@ -11,6 +11,15 @@ export class User {
   @Column({ type: "varchar", unique: true })
   email!: string;
 
-  @Column({ type: "decimal", precision: 10, scale: 2 })
+  @Column({
+    type: "decimal",
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
   balance!: number;
 }

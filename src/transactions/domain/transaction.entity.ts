@@ -27,7 +27,15 @@ export class Transaction {
   @JoinColumn({ name: "receiver_id" })
   receiver!: User;
 
-  @Column("decimal", { precision: 12, scale: 2 })
+  @Column("decimal", {
+    precision: 12,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
   amount!: number;
 
   @Column({
