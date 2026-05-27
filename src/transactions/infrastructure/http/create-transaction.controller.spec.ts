@@ -1,11 +1,11 @@
 import Fastify, { FastifyInstance } from "fastify";
-import { CreateTransactionUseCase } from "../../application/create-transaction.use-case";
-import transactionsController from "./create-transaction.controller";
+import { CreateTransactionUseCase } from "../../application/create-transaction/create-transaction.use-case";
 import { TransactionStatus } from "../../domain/transaction.entity";
 import {
   InsufficientFundsError,
   InvalidAmountError,
 } from "../../domain/transaction.errors";
+import createTransactionController from "./create-transaction.controller";
 
 jest.mock("../../../core/infrastructure/database/data-source", () => ({
   AppDataSource: {},
@@ -16,12 +16,12 @@ jest.mock("../../application/create-transaction.use-case");
 const MockedUseCase = CreateTransactionUseCase as jest.MockedClass<
   typeof CreateTransactionUseCase
 >;
-describe("TransactionsController", () => {
+describe("createTransactionController", () => {
   let app: FastifyInstance;
 
   beforeAll(async () => {
     app = Fastify({ logger: false });
-    await app.register(transactionsController);
+    await app.register(createTransactionController);
     await app.ready();
   });
 

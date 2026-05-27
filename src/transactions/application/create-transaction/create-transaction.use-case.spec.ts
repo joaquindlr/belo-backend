@@ -1,8 +1,8 @@
 import {
   InvalidAmountError,
   SameAccountTransferError,
-} from "../domain/transaction.errors";
-import { ITransactionRepository } from "../domain/transaction.repository.interface";
+} from "../../domain/transaction.errors";
+import { ITransactionRepository } from "../../domain/transaction.repository.interface";
 import { CreateTransactionUseCase } from "./create-transaction.use-case";
 
 const transactionRepository = {

@@ -3,8 +3,8 @@ import { CreateTransactionDTO } from "./create-transaction.dto";
 import {
   InvalidAmountError,
   SameAccountTransferError,
-} from "../domain/transaction.errors";
-import { ITransactionRepository } from "../domain/transaction.repository.interface";
+} from "../../domain/transaction.errors";
+import { ITransactionRepository } from "../../domain/transaction.repository.interface";
 
 export class CreateTransactionUseCase {
   constructor(private readonly transactionRepository: ITransactionRepository) {}

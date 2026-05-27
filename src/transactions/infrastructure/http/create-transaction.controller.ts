@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
-import { CreateTransactionUseCase } from "../../application/create-transaction.use-case";
+import { CreateTransactionUseCase } from "../../application/create-transaction/create-transaction.use-case";
 import { AppDataSource } from "../../../core/infrastructure/database/data-source";
-import { CreateTransactionDTO } from "../../application/create-transaction.dto";
+import { CreateTransactionDTO } from "../../application/create-transaction/create-transaction.dto";
 import { TransactionStatus } from "../../domain/transaction.entity";
 import {
   InsufficientFundsError,
@@ -10,7 +10,7 @@ import {
 } from "../../domain/transaction.errors";
 import { TransactionRepository } from "../persistence/transaction.repository";
 
-const transactionsController: FastifyPluginAsync = async (fastify) => {
+const createTransactionController: FastifyPluginAsync = async (fastify) => {
   const transactionRepository = new TransactionRepository(AppDataSource);
   const createTransactionUseCase = new CreateTransactionUseCase(
     transactionRepository,
@@ -53,4 +53,4 @@ const transactionsController: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-export default transactionsController;
+export default createTransactionController;

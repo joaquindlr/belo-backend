@@ -6,6 +6,7 @@ import {
 } from "../../domain/transaction.entity";
 import { User } from "../../../users/domain/user.entity";
 import { InsufficientFundsError } from "../../domain/transaction.errors";
+import { Paginated } from "../../../core/domain/core.interface";
 
 const MAX_VALUE_WITHOUT_APPROVAL = 50000;
 
@@ -72,5 +73,25 @@ export class TransactionRepository implements ITransactionRepository {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async findPaginatedByUser(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<Paginated<Transaction>> {
+    const skip = (page - 1) * limit;
+
+    const [transactions, total] = await this.dataSource.manager.findAndCount(
+      Transaction,
+      {
+        where: [{ sender: { id: userId } }, { receiver: { id: userId } }],
+        relations: { sender: true, receiver: true },
+        order: { date: "DESC" },
+        skip,
+        take: limit,
+      },
+    );
+    return { data: transactions, total, page, limit };
   }
 }
