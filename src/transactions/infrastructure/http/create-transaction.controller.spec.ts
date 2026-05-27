@@ -11,7 +11,7 @@ jest.mock("../../../core/infrastructure/database/data-source", () => ({
   AppDataSource: {},
 }));
 jest.mock("../persistence/transaction.repository");
-jest.mock("../../application/create-transaction.use-case");
+jest.mock("../../application/create-transaction/create-transaction.use-case");
 
 const MockedUseCase = CreateTransactionUseCase as jest.MockedClass<
   typeof CreateTransactionUseCase
@@ -21,6 +21,14 @@ describe("createTransactionController", () => {
 
   beforeAll(async () => {
     app = Fastify({ logger: false });
+    app.addSchema({
+      $id: "Error",
+      type: "object",
+      properties: {
+        code: { type: "string" },
+        message: { type: "string" },
+      },
+    });
     await app.register(createTransactionController);
     await app.ready();
   });
@@ -49,7 +57,7 @@ describe("createTransactionController", () => {
       payload: {
         senderId: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
         receiverId: "550e8400-e29b-41d4-a716-446655440000",
-        monto: 10000,
+        amount: 10000,
       },
     });
 
@@ -73,7 +81,7 @@ describe("createTransactionController", () => {
       payload: {
         senderId: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
         receiverId: "550e8400-e29b-41d4-a716-446655440000",
-        monto: 60000,
+        amount: 60000,
       },
     });
 
@@ -91,7 +99,7 @@ describe("createTransactionController", () => {
       payload: {
         senderId: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
         receiverId: "550e8400-e29b-41d4-a716-446655440000",
-        monto: 10000,
+        amount: 10000,
       },
     });
 
@@ -109,7 +117,7 @@ describe("createTransactionController", () => {
       payload: {
         senderId: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
         receiverId: "550e8400-e29b-41d4-a716-446655440000",
-        monto: -500,
+        amount: 100,
       },
     });
 
@@ -128,7 +136,7 @@ describe("createTransactionController", () => {
       payload: {
         senderId: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
         receiverId: "550e8400-e29b-41d4-a716-446655440000",
-        monto: 10000,
+        amount: 10000,
       },
     });
 

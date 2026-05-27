@@ -9,6 +9,12 @@ describe("TransactionRepository", () => {
   const mockManager = {
     findOne: jest.fn(),
     save: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getRawOne: jest.fn().mockResolvedValue({ totalPending: 0 }),
+    }),
   };
 
   const queryRunnerMock = {
