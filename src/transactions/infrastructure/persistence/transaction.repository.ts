@@ -38,7 +38,19 @@ export class TransactionRepository implements ITransactionRepository {
         throw new Error("Receiver not found");
       }
 
-      if (sender.balance < amount) {
+      const sumPendingAmount = await queryRunner.manager
+        .createQueryBuilder(Transaction, "transaction")
+        .select("SUM(transaction.amount)", "totalPending")
+        .where("transaction.sender_id = :senderId", { senderId })
+        .andWhere("transaction.status = :status", {
+          status: TransactionStatus.PENDING,
+        })
+        .getRawOne();
+
+      const totalPendingAmount = Number(sumPendingAmount.totalPending) || 0;
+      const availableBalance = Number(sender.balance) - totalPendingAmount;
+
+      if (availableBalance < amount) {
         throw new InsufficientFundsError();
       }
       const transaction = new Transaction();
