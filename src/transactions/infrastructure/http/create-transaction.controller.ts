@@ -9,6 +9,7 @@ import {
   SameAccountTransferError,
 } from "../../domain/transaction.errors";
 import { TransactionRepository } from "../persistence/transaction.repository";
+import { createTransactionSchema } from "./schemas/create-transaction.schema";
 
 const createTransactionController: FastifyPluginAsync = async (fastify) => {
   const transactionRepository = new TransactionRepository(AppDataSource);
@@ -16,7 +17,12 @@ const createTransactionController: FastifyPluginAsync = async (fastify) => {
     transactionRepository,
   );
 
-  fastify.post("/transactions", async (request, reply) => {
+  fastify.post(
+    "/transactions",
+    {
+      schema: createTransactionSchema,
+    },
+    async (request, reply) => {
     const dto = request.body as CreateTransactionDTO;
     try {
       const result = await createTransactionUseCase.execute(dto);

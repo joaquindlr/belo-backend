@@ -1,23 +1,23 @@
-# Getting Started with [Fastify-CLI](https://www.npmjs.com/package/fastify-cli)
-This project was bootstrapped with Fastify-CLI.
+This project uses Docker. Both the database (PostgreSQL) and API (Node.js) are containerized. To run the project locally, follow these steps:
 
-## Available Scripts
+How to Run the Proyect Locally
 
-In the project directory, you can run:
+1. Prerequisites
+   - Ensure you have Docker installed on your machine. You can download it from [Docker's official website](https://www.docker.com/get-started).
 
-### `npm run dev`
+2. Clone the Repository
+   - Clone this repository to your local machine.
 
-To start the app in dev mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+3. Navigate to the Project Directory and run the following command:
 
-### `npm start`
+   ```bash
+   docker-compose up --build
+   ```
 
-For production mode
+Once the build process is complete, the API will be up and running in http://localhost:3000, and you can see the documentation (Swagger UI) at http://localhost:3000/documentation.
 
-### `npm run test`
+You can stop the containers by running:
 
-Run the test cases.
-
-## Learn More
-
-To learn Fastify, check out the [Fastify documentation](https://fastify.dev/docs/latest/).
+    ```bash
+    docker-compose down
+    ```
