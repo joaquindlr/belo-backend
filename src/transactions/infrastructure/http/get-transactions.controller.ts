@@ -17,10 +17,11 @@ const getTransactionsController: FastifyPluginAsync = async (fastify) => {
       schema: getTransactionsSchema,
     },
     async (request, reply) => {
-      const { userId, page, limit } = request.query as GetTransactionsDTO;
+      const { userId, status, page, limit } = request.query as GetTransactionsDTO;
       try {
         const transactions = await getTransactionsUseCase.execute(
           userId,
+          status,
           page,
           limit,
         );

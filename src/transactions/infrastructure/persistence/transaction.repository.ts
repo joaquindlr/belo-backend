@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, FindOptionsWhere } from "typeorm";
 import { ITransactionRepository } from "../../domain/transaction.repository.interface";
 import {
   Transaction,
@@ -88,16 +88,26 @@ export class TransactionRepository implements ITransactionRepository {
   }
 
   async findPaginatedByUser(
-    userId: string,
+    userId: string | undefined,
+    status: string | undefined,
     page: number,
     limit: number,
   ): Promise<Paginated<Transaction>> {
     const skip = (page - 1) * limit;
 
+    const statusFilter = status ? { status: status as TransactionStatus } : {};
+
+    const where = userId
+      ? [
+          { sender: { id: userId }, ...statusFilter },
+          { receiver: { id: userId }, ...statusFilter },
+        ]
+      : statusFilter;
+
     const [transactions, total] = await this.dataSource.manager.findAndCount(
       Transaction,
       {
-        where: [{ sender: { id: userId } }, { receiver: { id: userId } }],
+        where,
         relations: { sender: true, receiver: true },
         order: { date: "DESC" },
         skip,
@@ -113,9 +123,17 @@ export class TransactionRepository implements ITransactionRepository {
     await queryRunner.startTransaction();
 
     try {
-      const transaction = await queryRunner.manager.findOne(Transaction, {
+      const transactionData = await queryRunner.manager.findOne(Transaction, {
         where: { id: transactionId },
         relations: { sender: true, receiver: true },
+      });
+
+      if (!transactionData) {
+        throw new Error("Transaction not found");
+      }
+
+      const transaction = await queryRunner.manager.findOne(Transaction, {
+        where: { id: transactionId },
         lock: { mode: "pessimistic_write" },
       });
 
@@ -128,7 +146,7 @@ export class TransactionRepository implements ITransactionRepository {
       }
 
       const sender = await queryRunner.manager.findOne(User, {
-        where: { id: transaction.sender.id },
+        where: { id: transactionData.sender.id },
         lock: { mode: "pessimistic_write" },
       });
 
@@ -137,18 +155,21 @@ export class TransactionRepository implements ITransactionRepository {
       }
 
       const receiver = await queryRunner.manager.findOne(User, {
-        where: { id: transaction.receiver.id },
+        where: { id: transactionData.receiver.id },
       });
 
       if (!receiver) {
         throw new Error("Receiver not found");
       }
 
+      transaction.sender = sender;
+      transaction.receiver = receiver;
+
       if (Number(sender.balance) < Number(transaction.amount)) {
         throw new InsufficientFundsError();
       }
 
-      sender.balance -= Number(sender.balance) - Number(transaction.amount);
+      sender.balance = Number(sender.balance) - Number(transaction.amount);
       receiver.balance = Number(receiver.balance) + Number(transaction.amount);
       transaction.status = TransactionStatus.CONFIRMED;
 
@@ -172,8 +193,8 @@ export class TransactionRepository implements ITransactionRepository {
 
   async reject(transactionId: string, reason: string): Promise<Transaction> {
     const queryRunner = this.dataSource.createQueryRunner();
-    queryRunner.connect();
-    queryRunner.startTransaction();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
       const transaction = await queryRunner.manager.findOne(Transaction, {

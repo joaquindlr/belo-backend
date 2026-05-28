@@ -9,7 +9,8 @@ export interface ITransactionRepository {
   ): Promise<Transaction>;
 
   findPaginatedByUser(
-    userId: string,
+    userId: string | undefined,
+    status: string | undefined,
     page: number,
     limit: number,
   ): Promise<Paginated<Transaction>>;
