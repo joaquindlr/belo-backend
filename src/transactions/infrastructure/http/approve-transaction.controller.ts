@@ -3,11 +3,14 @@ import { TransactionRepository } from "../persistence/transaction.repository";
 import { AppDataSource } from "../../../core/infrastructure/database/data-source";
 import { ApproveTransactionUseCase } from "../../application/approve-transaction/approve-transaction.use-case";
 import { approveTransactionSchema } from "./schemas/approve-transaction.schema";
+import { WebSocketTransactionNotifier } from "../../../core/infrastructure/adapters/WebSocketTransactionNotifier.adapter";
 
 const approveTransactionController: FastifyPluginAsync = async (fastify) => {
   const transactionRepository = new TransactionRepository(AppDataSource);
+  const transactionNotifier = new WebSocketTransactionNotifier();
   const approveTransactionUseCase = new ApproveTransactionUseCase(
     transactionRepository,
+    transactionNotifier,
   );
   fastify.patch(
     "/transactions/:id/approve",

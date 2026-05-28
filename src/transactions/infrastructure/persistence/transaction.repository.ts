@@ -1,4 +1,4 @@
-import { DataSource, FindOptionsWhere } from "typeorm";
+import { DataSource } from "typeorm";
 import { ITransactionRepository } from "../../domain/transaction.repository.interface";
 import {
   Transaction,
