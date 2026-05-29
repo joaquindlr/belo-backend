@@ -8,7 +8,9 @@ How to Run the Proyect Locally
 2. Clone the Repository
    - Clone this repository to your local machine.
 
-3. Navigate to the Project Directory and run the following command:
+3. Generate a .env file copying the .env.example.
+
+4. Navigate to the Project Directory and run the following command:
 
    ```bash
    docker-compose up --build
