@@ -23,3 +23,14 @@ You can stop the containers by running:
     ```bash
     docker-compose down
     ```
+
+---
+
+A continuacion, voy a explicar algunas de las decisiones tecnicas tomadas en el desarrollo:
+
+1.  Utilice fastify como framework de desarrollo para la api, debido a su facilidad de iniciacion y su rendimiento. En estos casos donde la velocidad de desarrollo es importante, me parecio una buena opcion, ademas de que estoy familiarizado con su uso. Ademas, su sistema de schemas me permite validar rapidamente las entradas, sin perder mucho tiempo en eso.
+2.  Como ORM utilice TypeORM, ya que es de los ORM mas populares en el ecosistema de Node.js con una gran compatibilidad con PostreSQL, ademas de que estoy familiarizado con su uso de transactions, lo que me permitio abordar rapidamente la concurrencia.
+3.  Utilice arquitectura hexagonal en todo el proyecto, tratando de respetar su estructura lo mas posible, ya que me parece la mejor forma de hacer un codigo mantenible y escalable. Ademas el patron de inyeccion de dependencias facilita muchisimo los test unitarios, permitiendo testear funcionalidades aisladas.
+4.  Decidir correr todo con docker compose build, ya que es la forma mas agnostica de correr el proyecto, intentando reducir lo máximo posible los problemas para que puedan levantarlo, ademas de que me permite correr un proceso de seeding para poblar la base de datos con usuarios, facilitandoles el trabjo de testeo.
+
+Tambien se tomo algunas consideraciones por cuestiones de tiempo, como no implementar un sistema de numeros enteros para menejar correctamente los errores de puntos flotantes, o los mensajes genericos de error (arrojo 500 siempre que tengo un error inesperado).
