@@ -14,6 +14,8 @@ How to Run the Proyect Locally
    docker-compose up --build
    ```
 
+Important: Running the command mentioned will initiate a seeding process to populate the user database, allowing you to begin testing immediately.
+
 Once the build process is complete, the API will be up and running in http://localhost:3000, and you can see the documentation (Swagger UI) at http://localhost:3000/documentation.
 
 You can stop the containers by running:
